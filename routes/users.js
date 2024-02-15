@@ -31,7 +31,7 @@ function validateUser(name, username, email, password) {
 }
 router.post('/signup', async (req, res) => {
     const { name, username, email, password } = req.body;
-    if (validateUser) { 
+    if (validateUser(name, username, email, password)) { 
         try {
             const existingUser = await User.findOne({ username: username });
             if (!existingUser) { 
@@ -49,13 +49,13 @@ router.post('/signup', async (req, res) => {
                     console.log(err);
                     return res.status(404).send(`Our server has some issue`);
                 }
-            }
+            } else return res.status(409).send("Username already exists.");
         }
         catch (err) {
             console.error(err);
             return res.status(422).send("Invalid input");
         }
-    }
+    } else return res.status(422).send("Invalid input");
 
 });
 
