@@ -11,7 +11,7 @@ const saltRounds = 10;
 
 
 const adminSchema = z.object({
-    name: z.string(),
+    name: z.string().min(1),
     username: z.string().min(3),
     password: z.string().min(8),
     email: z.string().email()
@@ -29,10 +29,7 @@ const foodSchema = z.object({
 
 function validateAdmin(username, name, email, password) {
     let data = adminSchema.safeParse({ username, name, email, password });
-    if (!data.success) return false;
-    else {
-        return true;
-    }
+    return data.success ? true : false;
 }
 
 function validateFood(category, name, protien, fat, carbs, quantity) { 
@@ -70,6 +67,7 @@ router.post('/signup', async (req, res) => {
             } else return res.status(409).send("Username already exists.");
         } catch (err) {
             console.error(err);
+            return res.status(422).send("Invalid input");
         }
     } else {
         return res.status(422).send("Invalid input");
