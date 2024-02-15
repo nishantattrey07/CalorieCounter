@@ -15,12 +15,29 @@ const adminSchema = z.object({
     username: z.string().min(3),
     password: z.string().min(8),
     email: z.string().email()
+}).strict();
+
+const foodSchema = z.object({
+    category: z.enum(['Fruit', 'Vegetables', 'Grains', 'Protiens', 'Dairy', 'Beverages', 'Preapared Foods', 'others']),
+    name: z.string(),
+    protien: z.number().positive(),
+    fat: z.number().positive(),
+    carbs: z.number(),
+    quantity: z.string()
 });
 
 
 function validateAdmin(username, name, email, password) {
     let data = adminSchema.safeParse({ username, name, email, password });
     if (!data.success) return false;
+    else {
+        return true;
+    }
+}
+
+function validateFood(category, name, protien, fat, carbs, quantity) { 
+    let data = foodSchema.safeParse({ category, name, protien, fat, carbs, quantity });
+    if (!data.success) return data.error;
     else {
         return true;
     }
@@ -87,7 +104,30 @@ router.get('/profile', adminMiddleware, async (req, res) => {
     });
 });
 
-router.post('/addFood', adminMiddleware, (req, res) => {
 
+router.post('/addFood', adminMiddleware, async (req, res) => {
+    const { category, name, protien, fat, carbs, quantity } = req.body;
+    if (validateFood(category, name, protien, fat, carbs, quantity)) {
+        try {
+            if (await Food.exists({ name: name })) return res.status(409).send(`${name} already exists.`);
+            else {
+                let newFoodItem = new Food({ category, name, protien, fat, carbs, quantity });
+                await newFoodItem.save();
+                res.json({
+                    message: `${name} added successfully`,
+                    id: newFoodItem._id
+                });
+            }
+        }
+        catch (err) { 
+            res.status(500).send(`Server error: ${err}`);
+        }
+        
+    }
+    else { 
+        res.json({
+            msg:data.error
+        });
+    }
 })
 module.exports = router;
