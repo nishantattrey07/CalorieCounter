@@ -101,6 +101,15 @@ router.get('/profile', adminMiddleware, async (req, res) => {
         email: userProfile.email
     });
 });
+router.get('/profile/users/:username', adminMiddleware, async (req, res) => {
+    const userId = req.params.username;
+    const userProfile = await User.findOne({ username: userId });
+    res.json({
+        username: userProfile.username,
+        name: userProfile.name,
+        email: userProfile.email
+    });
+});
 
 
 router.post('/addFood', adminMiddleware, async (req, res) => {
@@ -109,7 +118,7 @@ router.post('/addFood', adminMiddleware, async (req, res) => {
         try {
             if (await Food.exists({ name: name })) return res.status(409).send(`${name} already exists.`);
             else {
-                let newFoodItem = new Food({ category, name, protien, fat, carbs, quantity });
+                let newFoodItem = new Food({ category, name, protien, fat, carbs, quantity,global:true});
                 await newFoodItem.save();
                 res.json({
                     message: `${name} added successfully`,

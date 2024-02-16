@@ -4,6 +4,7 @@ const { Admin, User, Food } = require("../db");
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const { z } = require('zod');
+const userMiddleware = require("../middleware/user");
 require('dotenv').config();
 const router = Router();
 
@@ -28,6 +29,11 @@ function validateUser(name, username, email, password) {
     let data = userSchema.safeParse({ name, username, email, password });
     return data.success ? true : false;
 
+}
+
+function validateFood(category, name, protien, fat, carbs, quantity) { 
+    let data = foodSchema.safeParse({ category, name, protien, fat, carbs, quantity });
+    return data.success ? true : false;
 }
 router.post('/signup', async (req, res) => {
     const { name, username, email, password } = req.body;
@@ -73,5 +79,46 @@ router.post('/login', async (req, res) => {
         return res.status(401).send('Wrong credentials');
     }
 });
+
+router.get('/profile/:username', userMiddleware, async (req, res) => { 
+    let userId = req.params.username;
+    let userProfile = await User.findOne({ username: userId });
+    res.status(200).json({
+        name: userProfile.name,
+        username: userProfile.username,
+        email:userProfile.email
+    });
+});
+
+router.post('/addFood', userMiddleware, async function (req, res) {
+    const username = req.user.username;
+    const user = await User.findOne({ username: username });
+    const { category, name, protien, fat, carbs, quantity } = req.body;
+    try {
+        if (await Food.exists({ name: name })) return res.status(409).send(`${name} already exists.`);
+        else {
+            let newFoodItem = new Food({ category, name, protien, fat, carbs, quantity,user:user._id ,global: false });
+            await newFoodItem.save();
+            res.json({
+                message: `${name} added successfully`,
+                id: newFoodItem._id
+            });
+        }
+    }
+    catch (err) {
+        res.status(500).send(`Server error: ${err}`);
+    }
+
+});
+router.get('/foods',userMiddleware, async (req, res) => {
+    const username = req.user.username;
+    const userId = await User.findOne({ username: username });
+    const foodItems = await Food.find({
+        $or: [{ user: userId }, { global: true }]
+    });
+    res.json(foodItems);
+});
+
+
 
 module.exports = router;
