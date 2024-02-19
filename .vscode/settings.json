@@ -1,0 +1,8 @@
+{
+    "appService.defaultWebAppToDeploy": "undefined/subscriptions/ae8f58b7-72b5-474c-8625-3da95f03253b/resourceGroups/appsvc_linux_centralus/providers/Microsoft.Web/sites/FittTrack",
+    "appService.deploySubpath": ".",
+    "appService.zipIgnorePattern": [
+        "node_modules{,/**}",
+        ".vscode{,/**}"
+    ]
+}

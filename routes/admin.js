@@ -54,6 +54,7 @@ router.post('/signup', async (req, res) => {
                     let newAdmin = new Admin({ name, username, password: hashedPassword, email });
                     await newAdmin.save();
                     const token = jwt.sign({ username }, process.env.TOKEN_SECRET, { expiresIn: '7d' });
+                    console.log("Admin is being saved")
                     res.header('auth-token', token).json({
                         token: token,
                         id: newAdmin.id,
@@ -66,7 +67,7 @@ router.post('/signup', async (req, res) => {
                 }
             } else return res.status(409).send("Username already exists.");
         } catch (err) {
-            console.error(err);
+            console.log(err);
             return res.status(422).send("Invalid input");
         }
     } else {
@@ -80,6 +81,7 @@ router.post('/login', async (req, res) => {
     const validPassword = await bcrypt.compare(password, existingUser.password);
     if (existingUser && validPassword) {
         const token = jwt.sign({ username }, process.env.TOKEN_SECRET, { expiresIn: '7d' });
+        console.log("login is working")
         res.header('auth-token', token).json({
             token: token
         });

@@ -46,6 +46,7 @@ router.post('/signup', async (req, res) => {
                     const newUser = new User({ name, username, email, password: hashedPassword });
                     await newUser.save();
                     const token = jwt.sign({ username: username }, process.env.TOKEN_SECRET, {expiresIn:'7d'});
+                    console.log("User is being saved")
                     res.status(201).json({
                         token: token,
                         username: username,
@@ -58,7 +59,7 @@ router.post('/signup', async (req, res) => {
             } else return res.status(409).send("Username already exists.");
         }
         catch (err) {
-            console.error(err);
+            console.log(err);
             return res.status(422).send("Invalid input");
         }
     } else return res.status(422).send("Invalid input");
