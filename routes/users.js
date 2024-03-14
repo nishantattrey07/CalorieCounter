@@ -60,9 +60,9 @@ router.post('/signup', async (req, res) => {
         }
         catch (err) {
             console.log(err);
-            return res.status(422).send("Invalid input");
+            return res.status(400).send("Invalid input");
         }
-    } else return res.status(422).send("Invalid input");
+    } else return res.status(400).send("Invalid input");
 
 });
 
