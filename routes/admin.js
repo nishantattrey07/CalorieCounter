@@ -20,9 +20,10 @@ const adminSchema = z.object({
 const foodSchema = z.object({
     category: z.enum(['Fruit', 'Vegetables', 'Grains', 'Protiens', 'Dairy', 'Beverages', 'Preapared Foods', 'others']),
     name: z.string(),
-    protien: z.number().positive(),
+    protein: z.number().positive(),
     fat: z.number().positive(),
     carbs: z.number(),
+    calories:z.number(),
     quantity: z.string()
 });
 
