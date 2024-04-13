@@ -14,6 +14,24 @@ const UserSchema = new mongoose.Schema({
     email: { type: String, unique: true, required: true },
     username: { type: String, unique: true, required: true },
     password: { type: String, required: true },
+    dailyNutrition: [
+        {
+            date: Date,
+            totalCalories: Number,
+            totalProteins: Number,
+            totalCarbs: Number,
+            totalFats: Number,
+            categories: [
+                {
+                    name: String,
+                    calories: Number,
+                    proteins: Number,
+                    carbs: Number,
+                    fats: Number
+                }
+            ]
+        }
+    ],
     addedFood: [{
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'Food'

@@ -129,6 +129,60 @@ router.get('/foods',userMiddleware, async (req, res) => {
     res.status(200).json(foodItems);
 });
 
+router.post('/addNutrition/:username', async (req, res) => {
+    const { date, category, calories, proteins, carbs, fats } = req.body;
+    const user = await User.findOne({ username: req.params.username });
+    if (user) {
+        
+        const nutritionEntry = user.dailyNutrition.find(entry => entry.date.toISOString().slice(0, 10) === date);
+
+        if (nutritionEntry) {
+            
+            nutritionEntry.totalCalories += calories;
+            nutritionEntry.totalProteins += proteins;
+            nutritionEntry.totalCarbs += carbs;
+            nutritionEntry.totalFats += fats;
+
+            
+            const categoryEntry = nutritionEntry.categories.find(entry => entry.name === category);
+
+            if (categoryEntry) {
+                
+                categoryEntry.calories += calories;
+                categoryEntry.proteins += proteins;
+                categoryEntry.carbs += carbs;
+                categoryEntry.fats += fats;
+            } else {
+                
+                nutritionEntry.categories.push({ name: category, calories, proteins, carbs, fats });
+            }
+        } else {
+            
+            user.dailyNutrition.push({
+                date,
+                totalCalories: calories,
+                totalProteins: proteins,
+                totalCarbs: carbs,
+                totalFats: fats,
+                categories: [{ name: category, calories, proteins, carbs, fats }]
+            });
+        }
+
+        await user.save();
+        res.status(200).send('Nutrition data added');
+    } else {
+        res.status(404).send('User not found');
+    }
+});
+
+router.get('/getNutrition/:username', async (req, res) => {
+    const user = await User.findOne({ username: req.params.username });
+    if (user) {
+        res.status(200).json(user.dailyNutrition);
+    } else {
+        res.status(404).send('User not found');
+    }
+});
 
 
 module.exports = router;
