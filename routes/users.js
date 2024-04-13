@@ -72,7 +72,7 @@ router.post('/login', async (req, res) => {
     const validPassword = await bcrypt.compare(password, existingUser.password);
     if (existingUser && validPassword) {
         const token = jwt.sign({ username }, process.env.TOKEN_SECRET, { expiresIn: '7d' });
-        res.header('auth-token', token).json({
+        res.status(200).header('auth-token', token).json({
             token: token
         });
     }
