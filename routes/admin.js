@@ -33,8 +33,8 @@ function validateAdmin(username, name, email, password) {
     return data.success ? true : false;
 }
 
-function validateFood(category, name, protien, fat, carbs, quantity) { 
-    let data = foodSchema.safeParse({ category, name, protien, fat, carbs, quantity });
+function validateFood(category, name, protein, fat, carbs, calories, quantity) { 
+    let data = foodSchema.safeParse({ category, name, protein, fat, carbs,calories, quantity });
     if (!data.success) return data.error;
     else {
         return true;
@@ -116,12 +116,12 @@ router.get('/profile/users/:username', adminMiddleware, async (req, res) => {
 
 
 router.post('/addFood', adminMiddleware, async (req, res) => {
-    const { category, name, protien, fat, carbs, quantity } = req.body;
-    if (validateFood(category, name, protien, fat, carbs, quantity)) {
+    const { category, name, protein, fat, carbs, calories, quantity } = req.body;
+    if (validateFood(category, name, protein, fat, carbs, calories, quantity)) {
         try {
             if (await Food.exists({ name: name })) return res.status(409).send(`${name} already exists.`);
             else {
-                let newFoodItem = new Food({ category, name, protien, fat, carbs, quantity,global:true});
+                let newFoodItem = new Food({ category, name, protein, fat, carbs, calories, quantity,global:true});
                 await newFoodItem.save();
                 res.json({
                     message: `${name} added successfully`,

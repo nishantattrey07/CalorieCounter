@@ -95,21 +95,29 @@ router.get('/profile/:username', userMiddleware, async (req, res) => {
 router.post('/addFood', userMiddleware, async function (req, res) {
     const username = req.user.username;
     const user = await User.findOne({ username: username });
-    const { category, name, protien, fat, carbs, quantity } = req.body;
-    try {
-        if (await Food.exists({ name: name })) return res.status(409).send(`${name} already exists.`);
-        else {
-            let newFoodItem = new Food({ category, name, protien, fat, carbs, quantity,user:user._id ,global: false });
-            await newFoodItem.save();
-            res.json({
-                message: `${name} added successfully`,
-                id: newFoodItem._id
-            });
+    const { category, name, protein, fat, carbs, calories, quantity } = req.body;
+    if (validateFood(category, name, protein, fat, carbs, calories, quantity)) {
+        try {
+            if (await Food.exists({ name: name })) return res.status(409).send(`${name} already exists.`);
+            else {
+                let newFoodItem = new Food({ category, name, protein, fat, carbs, calories, quantity, user: user._id, global: false });
+                await newFoodItem.save();
+                res.json({
+                    message: `${name} added successfully`,
+                    id: newFoodItem._id
+                });
+            }
+        }
+        catch (err) {
+            res.status(500).send(`Server error: ${err}`);
         }
     }
-    catch (err) {
-        res.status(500).send(`Server error: ${err}`);
+    else {
+        res.status(422).json({
+            msg: data.error
+        });
     }
+    
 
 });
 router.get('/foods',userMiddleware, async (req, res) => {
