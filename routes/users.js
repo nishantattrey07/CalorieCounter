@@ -117,7 +117,7 @@ router.get('/foods',userMiddleware, async (req, res) => {
     const foodItems = await Food.find({
         $or: [{ user: userId }, { global: true }]
     });
-    res.json(foodItems);
+    res.status(200).json(foodItems);
 });
 
 
