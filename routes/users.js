@@ -82,9 +82,9 @@ router.post('/login', async (req, res) => {
     }
 });
 
-router.get('/profile/:username', userMiddleware, async (req, res) => { 
-    let userId = req.params.username;
-    let userProfile = await User.findOne({ username: userId });
+router.get('/profile', userMiddleware, async (req, res) => { 
+    const username = req.user.username;
+    let userProfile = await User.findOne({ username: username });
     res.status(200).json({
         name: userProfile.name,
         username: userProfile.username,
