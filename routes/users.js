@@ -129,9 +129,10 @@ router.get('/foods',userMiddleware, async (req, res) => {
     res.status(200).json(foodItems);
 });
 
-router.post('/addNutrition/:username', async (req, res) => {
+router.post('/addNutrition', userMiddleware, async (req, res) => {
+    const username = req.user.username;
     const { date, category, calories, proteins, carbs, fats } = req.body;
-    const user = await User.findOne({ username: req.params.username });
+    const user = await User.findOne({ username: username });
     if (user) {
         
         const nutritionEntry = user.dailyNutrition.find(entry => entry.date.toISOString().slice(0, 10) === date);
@@ -175,8 +176,9 @@ router.post('/addNutrition/:username', async (req, res) => {
     }
 });
 
-router.get('/getNutrition/:username', async (req, res) => {
-    const user = await User.findOne({ username: req.params.username });
+router.get('/getNutrition', async (req, res) => {
+    const username = req.user.username;
+    const user = await User.findOne({ username: username });
     if (user) {
         res.status(200).json(user.dailyNutrition);
     } else {
