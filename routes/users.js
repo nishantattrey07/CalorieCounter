@@ -176,7 +176,7 @@ router.post('/addNutrition', userMiddleware, async (req, res) => {
     }
 });
 
-router.get('/getNutrition', async (req, res) => {
+router.get('/getNutrition', userMiddleware, async (req, res) => {
     const username = req.user.username;
     const user = await User.findOne({ username: username });
     if (user) {
