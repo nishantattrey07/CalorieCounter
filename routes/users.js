@@ -187,8 +187,6 @@ router.get('/getNutrition', userMiddleware, async (req, res) => {
 });
 
 
-const bcrypt = require('bcryptjs');
-
 router.put('/updatePassword', userMiddleware, async (req, res) => {
     const username = req.user.username;
     const { newPassword } = req.body;
