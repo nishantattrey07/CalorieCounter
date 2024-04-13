@@ -187,4 +187,22 @@ router.get('/getNutrition', userMiddleware, async (req, res) => {
 });
 
 
+const bcrypt = require('bcryptjs');
+
+router.put('/updatePassword', userMiddleware, async (req, res) => {
+    const username = req.user.username;
+    const { newPassword } = req.body;
+    const user = await User.findOne({ username: username });
+    if (user) {
+        // Hash the new password before storing it
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(newPassword, salt);
+        user.password = hashedPassword;
+        await user.save();
+        res.status(200).send('Password updated');
+    } else {
+        res.status(404).send('User not found');
+    }
+});
+
 module.exports = router;
