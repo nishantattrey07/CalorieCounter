@@ -17,7 +17,7 @@ const userSchema = z.object({
 }).strict();
 
 const foodSchema = z.object({
-    category: z.enum(['Fruit', 'Vegetables', 'Grains', 'Protiens', 'Dairy', 'Beverages', 'Preapared Foods', 'others']),
+    category: z.enum(['Fruit', 'Vegetables', 'Grains', 'Proteins', 'Dairy', 'Beverages', 'Prepared Foods','others']),
     name: z.string(),
     protein: z.number().positive(),
     fat: z.number().positive(),
@@ -32,9 +32,9 @@ function validateUser(name, username, email, password) {
 
 }
 
-function validateFood(category, name, protien, fat, carbs, quantity) { 
-    let data = foodSchema.safeParse({ category, name, protien, fat, carbs, quantity });
-    return data.success ? true : false;
+function validateFood(category, name, protein, fat, carbs, calories, quantity) {
+    let data = foodSchema.safeParse({ category, name, protein, fat, carbs, calories, quantity });
+    return data.success ? true : data.error;
 }
 router.post('/signup', async (req, res) => {
     const { name, username, email, password } = req.body;
@@ -96,7 +96,8 @@ router.post('/addFood', userMiddleware, async function (req, res) {
     const username = req.user.username;
     const user = await User.findOne({ username: username });
     const { category, name, protein, fat, carbs, calories, quantity } = req.body;
-    if (validateFood(category, name, protein, fat, carbs, calories, quantity)) {
+    const validation = validateFood(category, name, protein, fat, carbs, calories, quantity);
+    if (validation===true) {
         try {
             if (await Food.exists({ name: name })) return res.status(409).send(`${name} already exists.`);
             else {
@@ -114,12 +115,11 @@ router.post('/addFood', userMiddleware, async function (req, res) {
     }
     else {
         res.status(422).json({
-            msg: data.error
+            msg: validation
         });
     }
-    
-
 });
+    
 router.get('/foods',userMiddleware, async (req, res) => {
     const username = req.user.username;
     const userId = await User.findOne({ username: username });
