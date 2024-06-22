@@ -46,7 +46,7 @@ router.post('/signup', async (req, res) => {
                     const hashedPassword = await bcrypt.hash(password, saltRounds);
                     const newUser = new User({ name, username, email, password: hashedPassword });
                     await newUser.save();
-                    const token = jwt.sign({ username: username }, process.env.TOKEN_SECRET, {expiresIn:'7d'});
+                    const token = jwt.sign({ username: username }, process.env.token_secret, {expiresIn:'7d'});
                     console.log("User is being saved")
                     res.status(201).json({
                         token: token,
@@ -72,7 +72,7 @@ router.post('/login', async (req, res) => {
     const existingUser = await User.findOne({ username: username });
     const validPassword = await bcrypt.compare(password, existingUser.password);
     if (existingUser && validPassword) {
-        const token = jwt.sign({ username }, process.env.TOKEN_SECRET, { expiresIn: '7d' });
+        const token = jwt.sign({ username }, process.env.token_secret, { expiresIn: '7d' });
         res.status(200).header('auth-token', token).json({
             token: token
         });
